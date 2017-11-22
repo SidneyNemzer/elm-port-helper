@@ -14,11 +14,11 @@ I created elm-port-helper to fix address these.
 
 ```js
 import ElmPorts from 'elm-port-helper'
-import Elm from 'elm/Page/Editor.elm'
+import Elm from '..elm/Page/Editor.elm'
 
 const storage = firebase.storage()
 
-const ports = ElmPorts.createPorts({
+const ports = {
   storagePut: {
     callback: {
       type: ElmPorts.callback.ERROR,
@@ -37,9 +37,11 @@ const ports = ElmPorts.createPorts({
     callback: ElmPorts.callback.RESULT_OR_ERROR
     // TODO finish this
   }
-})
+}
 
-const app = ElmPorts.attachPorts(ports)
+const app = Elm.Page.Editor.fullscreen()
+
+ElmPorts.attachPorts(ports, app)
 ```
 
 I'd recommend defining ports in a separate file, then importing the result of
@@ -53,29 +55,10 @@ See more examples in the examples folder (TODO link).
 
 ## API
 
-### `createPorts( ports )`
-
-This function takes an object that describes the JavaScript ports and returns
-an object that can be consumed by `attachPorts`.
-
-```js
-const ports = ElmPorts.createPorts({
-  myFirstPort: {
-    // contains a port object, Port Object below
-  },
-  mySecondPort: {
-    // ...
-  }
-})
-```
-
-Technically, this function just fills in the defaults for each port if an option
-isn't explicitly given.
-
 ### Port Object
 
 This object defines a single JavaScript port, which should be passed as the value
-in the object passed to `createPorts`
+in the object passed to `attachPorts`
 
 * `port.callback` -- Boolean or Object or one of `callback` (Default: `false`)  
   Describes what data should be returned to elm. Set to `false` to disable.
@@ -102,7 +85,7 @@ in the object passed to `createPorts`
 
 Example:
 ```js
-ElmPorts.createPorts({
+ElmPorts.attachPorts({
   examplePort1: {
     callback: {
       type: ElmPorts.callback.RESULT,
@@ -126,7 +109,7 @@ ElmPorts.createPorts({
     // directly as the value instead at port.func
     alert(message)
   }
-})
+}, app)
 ```
 
 ### `callback`
@@ -145,9 +128,10 @@ This built-in object provides the possible values for a port's callback option.
   `false`.
 
 
-### `attachPorts( ports, options )`
+### `attachPorts( ports, options, app )`
 
-The `ports` argument should be the result of calling `createPorts()`
+The `ports` argument should be an object where the keys are the names of ports
+and the values are Port Objects.
 
 The `options` is an Object with the following keys:
 
@@ -170,7 +154,7 @@ ElmPorts.attachPorts(ports, {
   listenToEmptyPorts: false,
   warnOnIgnoredReturns: true,
   logging: ElmPorts.logging.DEBUG
-})
+}, app)
 ```
 
 ### `logging`
@@ -190,5 +174,5 @@ Example:
 ```js
 ElmPorts.attachPorts(ports, {
   logging: ElmPorts.logging.DEBUG
-})
+}, app)
 ```
