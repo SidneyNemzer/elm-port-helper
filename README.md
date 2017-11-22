@@ -78,7 +78,9 @@ This object defines a single JavaScript port, which should be passed as the valu
 in the object passed to `createPorts`
 
 * `port.callback` -- Boolean or Object or one of `callback` (Default: `false`)  
-  Describes what data should be returned to elm. Set to `false` to disable
+  Describes what data should be returned to elm. Set to `false` to disable.
+  If a port has no callback, the function can be set directly as the value
+  instead of using the Port Object.
   * `port.callback.type` -- One of `callback` (Default: `callback.ERROR`)  
     Defines the exact type of return. As a shortcut, you can just directly set
     `port.callback` to this, instead of the full object.
@@ -101,7 +103,7 @@ in the object passed to `createPorts`
 Example:
 ```js
 ElmPorts.createPorts({
-  examplePort: {
+  examplePort1: {
     callback: {
       type: ElmPorts.callback.RESULT,
       // `tag` defaults to the first arg of the array, so here we need to
@@ -114,9 +116,15 @@ ElmPorts.createPorts({
       name: 'examplePortComplete'
     },
     func: ([val0, val1, val2]) => {
-      // This isn't a very useful port, but hopefully you get the idea
+      // This isn't a very useful port
+      // TODO Better example?
       return val0.indexOf(val1) + val2
     }
+  },
+  examplePort2: message => {
+    // As you can see, this port has no callback, so the function is defined
+    // directly as the value instead at port.func
+    alert(message)
   }
 })
 ```
