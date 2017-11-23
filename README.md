@@ -56,6 +56,37 @@ See full examples in [the examples folder](examples).
 
 ## API
 
+### `attachPorts( ports, options, app )`
+
+The `ports` argument should be an object where the keys are the names of ports
+and the values are [Port Objects](#port-objects).
+
+The `options` is an object with the following keys:
+
+* `options.listenToEmptyPorts` -- Boolean (Default: `true`)  
+  Attaches a listener to ports that the Elm app exposes if you don't explicitly
+  define a JavaScript handler for that port. If any of these "empty" ports are
+  called by Elm, a console warning will be printed. This acts as a reminder in
+  case you forget to handle a port on the JavaScript side. This warning will
+  be printed regardless of `options.logging`.
+* `options.warnOnIgnoredReturns` -- Boolean (Default: `true`)  
+  If the JavaScript function for a port returns a value but its `callback` is set
+  to `false`, this settings will print a warning in the console to let you know
+  that you might have forgotten to set up a callback for the return. This warning
+  will be printed regardless of `options.logging`.
+* `options.logging` -- Boolean (Default: `logging.ERRORS`)  
+  This sets what type of messages will be printed in the JavaScript console. See
+  the built-in `logging` object below.
+
+Example:
+```js
+ElmPorts.attachPorts(ports, {
+  listenToEmptyPorts: false,
+  warnOnIgnoredReturns: true,
+  logging: ElmPorts.logging.DEBUG
+}, app)
+```
+
 ### Port Object
 
 This object defines a single JavaScript port, which should be passed as the value
@@ -130,38 +161,6 @@ This built-in object provides the possible values for a port's callback option.
 * `callback.NONE`  
   Nothing is returned to Elm. This is the same as setting `port.callback` to
   `false`.
-
-
-### `attachPorts( ports, options, app )`
-
-The `ports` argument should be an object where the keys are the names of ports
-and the values are Port Objects.
-
-The `options` is an Object with the following keys:
-
-* `options.listenToEmptyPorts` -- Boolean (Default: `true`)  
-  Attaches a listener to ports that the Elm app exposes if you don't explicitly
-  define a JavaScript handler for that port. This will print a console warning
-  if Elm sends any data over those ports. This acts as a reminder if you forget
-  to handle a port on the JavaScript side. This option ignores
-  `options.logging`.
-* `options.warnOnIgnoredReturns` -- Boolean (Default: `true`)  
-  If the JavaScript function for a port returns a value but its `callback` is set
-  to `false`, this settings will print a warning in the console to let you know
-  that you might have forgotten to set up a callback for the return. This option
-  ignores `options.logging`.
-* `options.logging` -- Boolean (Default: `logging.ERRORS`)  
-  This sets what type of messages will be printed in the JavaScript console. See
-  the built-in `logging` object below.
-
-Example:
-```js
-ElmPorts.attachPorts(ports, {
-  listenToEmptyPorts: false,
-  warnOnIgnoredReturns: true,
-  logging: ElmPorts.logging.DEBUG
-}, app)
-```
 
 ### `logging`
 
