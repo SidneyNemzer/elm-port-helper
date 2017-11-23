@@ -120,7 +120,10 @@ This built-in object provides the possible values for a port's callback option.
   Errors turn into `[tag, error, null]`. A successful result turns into
   `[tag, '', result]` (empty string in place of an error).
 * `callback.ERROR`  
-  Errors turn into `[tag, error]`. Non-errors turn into `[tag, null]`.
+  Errors turn into `[tag, error]`. Non-errors turn into `[tag, null]`. This
+  is useful when your Elm code needs to know that the operation finished,
+  but the operation doesn't produce any data (for example, setting the
+  page title).
 * `callback.RESULT`  
   Result turns into `[tag, result]`. Errors are not sent to Elm.
 * `callback.NONE`  
