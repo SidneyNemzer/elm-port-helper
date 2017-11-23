@@ -1,10 +1,14 @@
-export const checkArgType = (expectedType, value, name, index) => {
-  checkArgType('string', expectedType, 'expectedType', 1)
-  checkArgType('string', name, 'name', 3)
-  checkArgType('number', index, 'index', 4)
-
+export const rawCheckArgType = (expectedType, value, name, index) => {
   /* eslint-disable valid-typeof */
   if (typeof value !== expectedType) {
     throw new TypeError(`Argument ${index} "${name}" should be ${expectedType} but it's ${typeof value}`)
   }
+}
+
+export const checkArgType = (expectedType, value, name, index) => {
+  rawCheckArgType('string', expectedType, 'expectedType', 1)
+  rawCheckArgType('string', name, 'name', 3)
+  rawCheckArgType('number', index, 'index', 4)
+
+  rawCheckArgType(expectedType, value, name, index)
 }
