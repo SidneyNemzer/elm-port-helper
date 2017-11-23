@@ -139,11 +139,13 @@ The `options` is an Object with the following keys:
   Attaches a listener to ports that the Elm app exposes if you don't explicitly
   define a JavaScript handler for that port. This will print a console warning
   if Elm sends any data over those ports. This acts as a reminder if you forget
-  to handle a port on the JavaScript side.
+  to handle a port on the JavaScript side. This option ignores
+  `options.logging`.
 * `options.warnOnIgnoredReturns` -- Boolean (Default: `true`)  
   If the JavaScript function for a port returns a value but its `callback` is set
   to `false`, this settings will print a warning in the console to let you know
-  that you might have forgotten to set up a callback for the return.
+  that you might have forgotten to set up a callback for the return. This option
+  ignores `options.logging`.
 * `options.logging` -- Boolean (Default: `logging.ERRORS`)  
   This sets what type of messages will be printed in the JavaScript console. See
   the built-in `logging` object below.
@@ -162,13 +164,13 @@ ElmPorts.attachPorts(ports, {
 This built-in object provides the possible options for `attachPorts`'s logging option
 
 * `logging.NONE`  
-  Don't print any messages at all
+  Don't print any messages at all. Fatal errors will still be thrown.
 * `logging.ERRORS`  
-  Only print a message when a port errors
+  Only print a message when a port errors or a non-fatal error is encountered
 * `logging.RESULT`  
-  Print whatever the result of a port is (including errors)
+  Print any errors and whatever the result of a port is
 * `logging.DEBUG`  
-  Prints errors and results, and some additional
+  Prints errors, results, and some internal debug info
 
 Example:
 ```js
