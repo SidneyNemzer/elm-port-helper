@@ -1,0 +1,36 @@
+{
+  "name": "elm-port-helper",
+  "version": "1.0.0",
+  "description": "Helper functions for managing Elm ports",
+  "main": "index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SidneyNemzer/elm-port-helper.git"
+  },
+  "keywords": [
+    "elm",
+    "ports"
+  ],
+  "author": "Sidney Nemzer",
+  "bugs": {
+    "url": "https://github.com/SidneyNemzer/elm-port-helper/issues"
+  },
+  "homepage": "https://github.com/SidneyNemzer/elm-port-helper#readme",
+  "dependencies": {
+    "ramda": "^0.25.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.11.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}
