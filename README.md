@@ -45,10 +45,10 @@ ElmPorts.attachPorts({
 
 ```
 
-I'd recommend defining ports in a separate file, then importing the result of
-`createPorts` when initializing a page.
+I'd recommend defining ports in a separate file, then importing the object of
+ports in each JavaScript file that initializes an Elm module.
 
-See more examples in the examples folder (TODO link).
+See full examples in [the examples folder](examples).
 
 ## Installing
 
