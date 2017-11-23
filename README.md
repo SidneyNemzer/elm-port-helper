@@ -70,13 +70,12 @@ The `options` is an object with the following keys:
   case you forget to handle a port on the JavaScript side. This warning will
   be printed regardless of `options.logging`.
 * `options.warnOnIgnoredReturns` -- Boolean (Default: `true`)  
-  If the JavaScript function for a port returns a value but its `callback` is set
-  to `false`, this settings will print a warning in the console to let you know
-  that you might have forgotten to set up a callback for the return. This warning
+  Setting this to `true` will print a warning if the JavaScript function for a
+  port returns a value but its `callback` is set to `false`. This warning
   will be printed regardless of `options.logging`.
 * `options.logging` -- Boolean (Default: `logging.ERRORS`)  
-  This sets what type of messages will be printed in the JavaScript console. See
-  the built-in `logging` object below.
+  This changes what type of messages will be printed in the JavaScript console.
+  See the documentation for the built-in `logging` object below.
 
 Example:
 ```js
@@ -89,8 +88,8 @@ ElmPorts.attachPorts(ports, {
 
 ### Port Object
 
-This object defines a single JavaScript port, which should be passed as the value
-in the object passed to `attachPorts`
+This object defines a single JavaScript port. It should a value in the object
+passed to [`attachPorts`](attachports-ports-options-app-)
 
 * `port.callback` -- Boolean or Object or one of `callback` (Default: `false`)  
   Describes what data should be returned to elm. Set to `false` to disable.
@@ -118,11 +117,11 @@ in the object passed to `attachPorts`
 Example:
 ```js
 ElmPorts.attachPorts({
-  examplePort1: {
+  examplePort: {
     callback: {
       type: ElmPorts.callback.RESULT,
       // `tag` defaults to the first arg of the array, so here we need to
-      // explicitly retrieve it from the end of the args.
+      // explicitly retrieve the tag from the end of the args.
       tag: args => ({
         tag: args[3],
         rest: args.slice(0, 3)
@@ -164,7 +163,7 @@ This built-in object provides the possible values for a port's callback option.
 
 ### `logging`
 
-This built-in object provides the possible options for `attachPorts`'s logging option
+This built-in object provides the possible options for [`attachPorts`](attachports-ports-options-app-)'s logging option
 
 * `logging.NONE`  
   Don't print any messages at all. Fatal errors will still be thrown.
