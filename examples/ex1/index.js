@@ -1,31 +1,31 @@
-import { callbacks, portWrapper } from 'elm-port-helper'
+// When you import elm-port-helper, you'll import from 'elm-port-helper'.
+// Here, '../../' is used to import from the grandparent folder.
+import ElmPorts from '../../'
 
-const storage = firebase.storage()
+// Elm files can be imported because webpack has been set up to use elm-webpack-loader
+import Elm from './Main.elm'
 
-const attachPorts = portWrapper({
-  storagePut: { // This is the name of the port. It should be the same as the port in Elm.
-    callback: {
-      type: callbacks.ERROR, // Report errors to Elm through the port. No data will be returned.
-      tag: args => ({
-        tag: args[3],
-        rest: args.slice(0, 3)
-      }) // tag defaults to the first arg
-    },
-    func: ([path, content, type]) => (
-      storage.refFromURL(path)
-        .putString(content, firebase.storage.StringFormat.RAW, {contentType: type})
-    )
-    // Notice that func returns a promise
+const app = Elm.Main.fullscreen()
+
+// Set window.app to the Elm app object for debugging
+window.app = app
+
+ElmPorts.attachPorts({
+  setTitle: title => {
+    window.title = title
+  },
+  storageSet: {
+    callback: ElmPorts.callback.NONE,
+    func: ([path, value]) => {
+      window.localStorage[path] = value
+    }
   },
   storageGet: {
-    // This port returns data or an error
-    // The first element of the arg is used as the tag
-    callback: callbacks.RESULT_OR_ERROR
-    func: path => (
-      storage.refFromURL(path)
-        .getDownloadURL()
-        .then(fetch)
-        .then(res => res.text())
+    callback: ElmPorts.callback.RESULT,
+    func: ([path]) => (
+      window.localStorage.getItem(path) || ''
     )
   }
-})
+}, {
+  logging: ElmPorts.logging.DEBUG
+}, app)
