@@ -14,34 +14,35 @@ I created elm-port-helper to fix address these.
 
 ```js
 import ElmPorts from 'elm-port-helper'
-import Elm from '..elm/Page/Editor.elm'
+import Elm from './Main.elm'
 
-const storage = firebase.storage()
+const app = Elm.Main.fullscreen()
 
-const ports = {
-  storagePut: {
-    callback: {
-      type: ElmPorts.callback.ERROR,
-      tag: args => ({
-        tag: args[3],
-        rest: args.slice(0, 3)
-      }),
-      name: 'storagePutFinished'
-    },
-    func: ([path, content, type]) => (
-      storage.refFromURL(path)
-        .putString(content, firebase.storage.StringFormat.RAW)
-    )
+ElmPorts.attachPorts({
+  // These first two ports are called by Elm and preform some side effect.
+  // They don't return data to Elm
+  setTitle: title => {
+    window.title = title
   },
+  storageSet: ([path, value]) => {
+      window.localStorage[path] = value
+    }
+  },
+
+  // This port is called by Elm then returns some data
   storageGet: {
-    callback: ElmPorts.callback.RESULT_OR_ERROR
-    // TODO finish this
+    // The callback.RESULT constant tells elm-port-helper to expect some result
+    // from the func and give it to Elm. Since a callback port name is not
+    // specified, this port's name plus "Finished" will be used (storageGetFinished)
+    callback: ElmPorts.callback.RESULT,
+    func: ([path]) => (
+      window.localStorage.getItem(path) || ''
+    )
   }
-}
+}, {
+  logging: ElmPorts.logging.DEBUG
+}, app)
 
-const app = Elm.Page.Editor.fullscreen()
-
-ElmPorts.attachPorts(ports, app)
 ```
 
 I'd recommend defining ports in a separate file, then importing the result of
