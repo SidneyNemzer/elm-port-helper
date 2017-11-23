@@ -89,7 +89,7 @@ ElmPorts.attachPorts(ports, {
 ### Port Object
 
 This object defines a single JavaScript port. It should a value in the object
-passed to [`attachPorts`](attachports-ports-options-app-)
+passed to [`attachPorts`](#attachports-ports-options-app-)
 
 * `port.callback` -- Boolean or Object or one of `callback` (Default: `false`)  
   Describes what data should be returned to elm. Set to `false` to disable.
@@ -163,7 +163,7 @@ This built-in object provides the possible values for a port's callback option.
 
 ### `logging`
 
-This built-in object provides the possible options for [`attachPorts`](attachports-ports-options-app-)'s logging option
+This built-in object provides the possible options for [`attachPorts`](#attachports-ports-options-app-)'s logging option
 
 * `logging.NONE`  
   Don't print any messages at all. Fatal errors will still be thrown.
