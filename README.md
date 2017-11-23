@@ -59,7 +59,7 @@ See full examples in [the examples folder](examples).
 ### `attachPorts( ports, options, app )`
 
 The `ports` argument should be an object where the keys are the names of ports
-and the values are [Port Objects](#port-objects).
+and the values are [Port Objects](#port-object).
 
 The `options` is an object with the following keys:
 
