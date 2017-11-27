@@ -61,7 +61,7 @@ See full examples in [the examples folder](examples).
 The `ports` argument should be an object where the keys are the names of ports
 and the values are [Port Objects](#port-object).
 
-The `options` is an object with the following keys:
+`options` is an object with the following keys:
 
 * `options.listenToEmptyPorts` -- Boolean (Default: `true`)  
   Attaches a listener to ports that the Elm app exposes if you don't explicitly
@@ -75,7 +75,7 @@ The `options` is an object with the following keys:
   will be printed regardless of `options.logging`.
 * `options.logging` -- Boolean (Default: `logging.ERRORS`)  
   This changes what type of messages will be printed in the JavaScript console.
-  See the documentation for the built-in `logging` object below.
+  See the documentation for the built-in [`logging` object](#logging) below.
 
 Example:
 ```js
@@ -88,31 +88,33 @@ ElmPorts.attachPorts(ports, {
 
 ### Port Object
 
-This object defines a single JavaScript port. It should a value in the object
+This object defines a single JavaScript port. It should be a value in the object
 passed to [`attachPorts`](#attachports-ports-options-app-)
 
-* `port.callback` -- Boolean or Object or one of `callback` (Default: `false`)  
+* `port.callback` -- Boolean or Object or one of [`callback`](#callback) (Default: `false`)  
   Describes what data should be returned to elm. Set to `false` to disable.
-  If a port has no callback, the function can be set directly as the value
+  If a port has no callback, the `port.func` can be set directly as the value
   instead of using the Port Object.
-  * `port.callback.type` -- One of `callback` (Default: `callback.ERROR`)  
-    Defines the exact type of return. As a shortcut, you can just directly set
-    `port.callback` to this, instead of the full object.
+  * `port.callback.type` -- One of [`callback`](#callback) (Default: `callback.ERROR`)  
+    Defines the exact type of return. If you don't need to specify
+    `port.callback.tag` and `port.callback.name`, you can just directly set
+    `port.callback` to the type, instead of the full object.
   * `port.callback.tag` -- `false` or `function` (Default: `arg[0]`)  
-    This is a function that determines what to use as the callback value. The
-    function should return an Object that contains the keys `tag` and `rest`. The
+    This function determines what to use as the callback value. The function
+    should return an Object that contains the keys `tag` and `rest`. The
     tag value lets Elm track which operation just completed, and usually isn't
-    used in the JavaScript side of the port. The tag is always passed as the first
-    value in the result array.
+    used in the JavaScript side of the port. The tag is always returned to Elm
+    as the first value in the result array.
   * `port.callback.name` -- String (Default: port's name + `'Finished'`)
-    The name of the Elm port to send the result to. Defaults to this port's name
+    The name of the Elm port to send the result to. Defaults to the port's name
     plus `Finished`.
 * `port.func` -- `function`  
   The actual port function. This is the JavaScript that will run when Elm calls
   the port. If it returns a Promise, elm-port-helper will wait for the Promise
   to resolve. The result of the Promise, or any plain value, will be wrapped in
-  an array with the callback tag as the first value. If the callback tag is
-  disabled, the result is *not* wrapped in an array.
+  an array with the callback tag as the first value. Depending on
+  `port.callback.type`, an error placeholder will be added to the array.
+
 
 Example:
 ```js
@@ -136,7 +138,7 @@ ElmPorts.attachPorts({
     }
   },
   examplePort2: message => {
-    // As you can see, this port has no callback, so the function is defined
+    // This port has no callback, so the function is defined
     // directly as the value instead at port.func
     alert(message)
   }
@@ -146,10 +148,12 @@ ElmPorts.attachPorts({
 ### `callback`
 
 This built-in object provides the possible values for a port's callback option.
+When the tag is disabled, `RESULT_OR_ERROR` is an array with the error and result
+while `ERROR` and `RESULT` become a plain value (not wrapped in an array).
 
 * `callback.RESULT_OR_ERROR`  
   Errors turn into `[tag, error, null]`. A successful result turns into
-  `[tag, '', result]` (empty string in place of an error).
+  `[tag, '', result]` (with an empty string in place of an error).
 * `callback.ERROR`  
   Errors turn into `[tag, error]`. Non-errors turn into `[tag, null]`. This
   is useful when your Elm code needs to know that the operation finished,
@@ -158,21 +162,21 @@ This built-in object provides the possible values for a port's callback option.
 * `callback.RESULT`  
   Result turns into `[tag, result]`. Errors are not sent to Elm.
 * `callback.NONE`  
-  Nothing is returned to Elm. This is the same as setting `port.callback` to
-  `false`.
+  Nothing is sent to Elm. This is the same as setting `port.callback` to `false`.
 
 ### `logging`
 
-This built-in object provides the possible options for [`attachPorts`](#attachports-ports-options-app-)'s logging option
+This built-in object provides the possible values for
+[`attachPorts`](#attachports-ports-options-app-)' logging option.
 
 * `logging.NONE`  
-  Don't print any messages at all. Fatal errors will still be thrown.
+  Don't print any messages. Fatal errors will still be thrown.
 * `logging.ERRORS`  
   Only print a message when a port errors or a non-fatal error is encountered
 * `logging.RESULT`  
   Print any errors and whatever the result of a port is
 * `logging.DEBUG`  
-  Prints errors, results, and some internal debug info
+  Print errors, results, and internal debug info
 
 Example:
 ```js
