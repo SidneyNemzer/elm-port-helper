@@ -197,12 +197,15 @@ const attachPorts = (ports, options, app) => {
         if (portError) {
           logger.error(`Port ${name} errored when running (not sent to Elm):`, portError)
           logger.debug(`Error result from ${name} was not returned to Elm because the port's callback is set to ${portDefinition.callback}`)
-        } else if (options.warnOnIgnoredReturns && portResult) {
-          const callbackSetting = expandedCallback && expandedCallback.type
-          console.warn(
-            `Port ${name} returned a non-undefined value:`,
-            portResult,
-            `\nThe value was not returned to Elm because the port's callback is set to ${callbackSetting}`)
+        } else if (portResult) {
+          if (options.warnOnIgnoredReturns) {
+            const callbackSetting = expandedCallback && expandedCallback.type
+            console.warn(
+              `Port ${name} returned a non-undefined value:`,
+              portResult,
+              `\nThe value was not returned to Elm because the port's callback is set to ${callbackSetting}`
+            )
+          }
         } else {
           logger.debug(`Port ${name} finished successfully with no result`)
         }
