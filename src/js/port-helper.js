@@ -243,6 +243,19 @@ const attachPorts = (ports, options, app) => {
       return attachedPorts
     }, [])
 
+  const portCounts
+    = Object.keys(app.ports)
+      .reduce(
+        (ports, portName) =>
+          R.over(
+            isInputPort(app.ports[portName]) ? R.lensProp('input') : R.lensProp('output'),
+            R.inc,
+            ports
+          ),
+        { input: 0, output: 0 }
+      )
+
+  logger.debug(`Elm app has ${portCounts.input} input port(s) and ${portCounts.output} output port(s)`)
   logger.debug(`Attached ${attachedPorts.length} out of ${Object.keys(ports).length} user defined ports`)
   return app
 }
