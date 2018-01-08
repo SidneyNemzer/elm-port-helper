@@ -106,6 +106,10 @@ const attachPorts = (ports, options, app) => {
   // Create logger
   const logger = createLogger('elm-port-helper', options.logging || logging.ERRORS)
 
+  if (options.logging >= logging.DEBUG) {
+    console.warn('[elm-port-helper] Debug logging is enabled. There will be a lot of messages. You might want disable this in production.')
+  }
+
   const portWrapper = (name, portDefinition, elmPort) => {
     const func
       = typeof portDefinition === 'function'
