@@ -104,7 +104,7 @@ const attachPorts = (ports, options, app) => {
   options.warnOnIgnoredReturns = typeof options.warnOnIgnoredReturns === 'boolean' ? options.warnOnIgnoredReturns : true
 
   // Create logger
-  const logger = createLogger(options.logging || logging.ERRORS)
+  const logger = createLogger('elm-port-helper', options.logging || logging.ERRORS)
 
   const portWrapper = (name, portDefinition, elmPort) => {
     const func
