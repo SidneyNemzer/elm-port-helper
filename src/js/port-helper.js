@@ -276,7 +276,7 @@ const attachPorts = (ports, options, app) => {
     )
 
   logger.debug(`Elm app has ${portCounts.input} input port(s) and ${portCounts.output} output port(s)`)
-  logger.debug(`Attached ${attachedPorts.length} out of ${Object.keys(ports).length} user defined ports`)
+  logger.debug(`Attached ${attachedPorts.length} out of ${Object.keys(ports).length} user defined port(s)`)
   return app
 }
 
