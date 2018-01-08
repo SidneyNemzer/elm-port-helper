@@ -124,13 +124,21 @@ const attachPorts = (ports, options, app) => {
     }
 
     elmPort.subscribe(data => {
-      logger.debug(`Port ${name} has been called by Elm with`, data)
       const splitArgs
         = expandedCallback
           ? typeof expandedCallback.tag === 'function'
             ? expandedCallback.tag(data)
             : false
           : false
+
+      if (splitArgs) {
+        logger.debug(`Port ${name} has been called by elm with`, {
+          tag: splitArgs.tag,
+          data: splitArgs.rest
+        })
+      } else {
+        logger.debug(`Port ${name} has been called by Elm with`, data)
+      }
 
       // TODO Resolve promises that are returned from func
       let portResult
