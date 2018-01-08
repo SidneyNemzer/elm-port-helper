@@ -166,7 +166,7 @@ const attachPorts = (ports, options, app) => {
               throw new Error(`Port ${name} has an unexpected callback.type: ${expandedCallback.type}`)
           }
         } else {
-          logger.info(`Port ${name} returned (sending to Elm):`, portResult)
+          logger.info(`Port ${name} returned a value to Elm:`, portResult)
           switch (expandedCallback.type) {
             case callback.RESULT_OR_ERROR:
               if (splitArgs) {
