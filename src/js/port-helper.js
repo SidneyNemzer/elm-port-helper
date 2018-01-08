@@ -28,6 +28,9 @@ const looksLikeOptions = maybeOptions =>
 const looksLikeApp = maybeApp =>
   R.has('ports', maybeApp)
 
+const looksLikePromise = maybePromise =>
+  maybePromise && typeof maybePromise.then === 'function'
+
 const isInputPort = port =>
   R.has('send', port)
 
@@ -144,84 +147,90 @@ const attachPorts = (ports, options, app) => {
         logger.debug(`Port ${name} has been called by Elm with`, data)
       }
 
-      // TODO Resolve promises that are returned from func
       let portResult
-      let portError = null
       try {
         portResult = func(splitArgs ? splitArgs.rest : data)
+        portResult = looksLikePromise(portResult)
+          ? (logger.debug(`Resolving promise result from port ${name}...`), portResult)
+          : Promise.resolve(portResult)
       } catch (error) {
-        portError = error
+        portResult = Promise.reject(error)
       }
 
-      if (expandedCallback) {
-        if (portError) {
-          logger.error(`Port ${name} errored when running (sending to Elm):`, portError)
-          switch (expandedCallback.type) {
-            case callback.RESULT_OR_ERROR:
-              if (splitArgs) {
-                app.ports[expandedCallback.name].send([splitArgs.tag, portError, null])
+      portResult
+        .then(result => {
+          if (expandedCallback) {
+            logger.info(`Port ${name} returned a value to Elm:`, result)
+            switch (expandedCallback.type) {
+              case callback.RESULT_OR_ERROR:
+                if (splitArgs) {
+                  app.ports[expandedCallback.name].send([splitArgs.tag, '', result])
+                } else {
+                  app.ports[expandedCallback.name].send(['', result])
+                }
+                break
+              case callback.ERROR:
+                if (splitArgs) {
+                  app.ports[expandedCallback.name].send([splitArgs.tag, null])
+                } else {
+                  app.ports[expandedCallback.name].send(null)
+                }
+                break
+              case callback.RESULT:
+                if (splitArgs) {
+                  app.ports[expandedCallback.name].send([splitArgs.tag, result])
+                } else {
+                  app.ports[expandedCallback.name].send(result)
+                }
+                break
+              default:
+                throw new Error(`Port ${name} has an unexpected callback.type: ${expandedCallback.type}`)
+            }
+          } else {
+            if (result !== undefined) {
+              if (options.warnOnIgnoredReturns) {
+                const callbackSetting = expandedCallback && expandedCallback.type
+                console.warn(
+                  `Port ${name} returned a non-undefined value:`,
+                  result,
+                  `\nThe value was not returned to Elm because the port's callback is set to ${callbackSetting}`
+                )
               } else {
-                app.ports[expandedCallback.name].send([portError, null])
+                logger.debug(`Port ${name} finished successfully with a non-undefined result (warning suppressed because options.warnOnIgnoredReturns = ${options.warnOnIgnoredReturns})`)
               }
-              break
-            case callback.ERROR:
-              if (splitArgs) {
-                app.ports[expandedCallback.name].send([splitArgs.tag, portError])
-              } else {
-                app.ports[expandedCallback.name].send(portError)
-              }
-              break
-            case callback.RESULT:
-              // Do nothing
-              break
-            default:
-              throw new Error(`Port ${name} has an unexpected callback.type: ${expandedCallback.type}`)
+            } else {
+              logger.debug(`Port ${name} finished successfully with no result`)
+            }
           }
-        } else {
-          logger.info(`Port ${name} returned a value to Elm:`, portResult)
-          switch (expandedCallback.type) {
-            case callback.RESULT_OR_ERROR:
-              if (splitArgs) {
-                app.ports[expandedCallback.name].send([splitArgs.tag, '', portResult])
-              } else {
-                app.ports[expandedCallback.name].send(['', portResult])
-              }
-              break
-            case callback.ERROR:
-              if (splitArgs) {
-                app.ports[expandedCallback.name].send([splitArgs.tag, null])
-              } else {
-                app.ports[expandedCallback.name].send(null)
-              }
-              break
-            case callback.RESULT:
-              if (splitArgs) {
-                app.ports[expandedCallback.name].send([splitArgs.tag, portResult])
-              } else {
-                app.ports[expandedCallback.name].send(portResult)
-              }
-              break
-            default:
-              throw new Error(`Port ${name} has an unexpected callback.type: ${expandedCallback.type}`)
+        }, portError => {
+          if (expandedCallback) {
+            logger.error(`Port ${name} errored when running (sending to Elm):`, portError)
+            switch (expandedCallback.type) {
+              case callback.RESULT_OR_ERROR:
+                if (splitArgs) {
+                  app.ports[expandedCallback.name].send([splitArgs.tag, portError, null])
+                } else {
+                  app.ports[expandedCallback.name].send([portError, null])
+                }
+                break
+              case callback.ERROR:
+                if (splitArgs) {
+                  app.ports[expandedCallback.name].send([splitArgs.tag, portError])
+                } else {
+                  app.ports[expandedCallback.name].send(portError)
+                }
+                break
+              case callback.RESULT:
+                // Do nothing
+                break
+              default:
+                throw new Error(`Port ${name} has an unexpected callback.type: ${expandedCallback.type}`)
+            }
+          } else {
+            logger.error(`Port ${name} errored when running (not sent to Elm):`, portError)
+            logger.debug(`Error result from ${name} was not returned to Elm because the port's callback is set to ${portDefinition.callback}`)
           }
-        }
-      } else {
-        if (portError) {
-          logger.error(`Port ${name} errored when running (not sent to Elm):`, portError)
-          logger.debug(`Error result from ${name} was not returned to Elm because the port's callback is set to ${portDefinition.callback}`)
-        } else if (portResult) {
-          if (options.warnOnIgnoredReturns) {
-            const callbackSetting = expandedCallback && expandedCallback.type
-            console.warn(
-              `Port ${name} returned a non-undefined value:`,
-              portResult,
-              `\nThe value was not returned to Elm because the port's callback is set to ${callbackSetting}`
-            )
-          }
-        } else {
-          logger.debug(`Port ${name} finished successfully with no result`)
-        }
-      }
+        })
     })
   }
 
