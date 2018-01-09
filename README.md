@@ -52,7 +52,14 @@ See full examples in [the examples folder](examples).
 
 ## Installing
 
-*TODO explain how to install*
+`elm-port-helper` is not published on NPM yet. However, NPM can install directly
+from GitHub:
+
+```
+npm install sidneynemzer/elm-port-helper#v1.0.0
+```
+
+Replace "1.0.0" with the version that you want
 
 ## API
 
