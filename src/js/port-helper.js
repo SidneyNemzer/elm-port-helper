@@ -1,103 +1,20 @@
 import * as R from 'ramda'
 import createLogger from './logger'
 import { checkArgType } from './util'
-
-/* Define constants */
-
-const callback = {
-  NONE: false,
-  RESULT: 'RESULT',
-  ERROR: 'ERROR',
-  RESULT_OR_ERROR: 'RESULT_OR_ERROR'
-}
-
-const logging = {
-  NONE: 0,
-  ERRORS: 1,
-  RESULT: 2,
-  DEBUG: 3
-}
-
-/* Define a few helper functions */
-
-const looksLikeOptions = maybeOptions =>
-  R.has('listenToEmptyPorts', maybeOptions)
-  || R.has('warnOnIgnoredReturns', maybeOptions)
-  || R.has('logging', maybeOptions)
-
-const looksLikeApp = maybeApp =>
-  R.has('ports', maybeApp)
-
-const looksLikePromise = maybePromise =>
-  maybePromise && typeof maybePromise.then === 'function'
-
-const isInputPort = port =>
-  R.has('send', port)
-
-const emptyPortListener = name => data =>
-  console.warn(`The empty port "${name}" sent data to JavaScript:`, data)
-
-const defaultTagFunction = args => ({
-  tag: args[0],
-  rest: args.slice(1)
-})
-
-const expandCallbackObject = (logger, portName, portDefinitionCallback) => {
-  let expandedCallback = false
-  if (typeof portDefinitionCallback === 'object') {
-    if (
-      portDefinitionCallback.tag !== undefined
-      && typeof portDefinitionCallback.tag !== 'function'
-      && typeof portDefinitionCallback.tag !== 'boolean'
-    ) {
-      throw new TypeError(`Port ${portName}.callback.tag should be a function but it's ${typeof portDefinitionCallback.tag}`)
-    }
-
-    if (
-      portDefinitionCallback.name !== undefined
-      && typeof portDefinitionCallback.name !== 'string'
-    ) {
-      throw new TypeError(`Port ${portName}.callback.name should be a string but it's ${typeof portDefinitionCallback.name}`)
-    }
-
-    expandedCallback = {
-      type: portDefinitionCallback.type || callback.ERROR,
-      tag: portDefinitionCallback.tag === undefined
-        ? defaultTagFunction
-        : portDefinitionCallback.tag,
-      name: portDefinitionCallback.name || portName + 'Finished'
-    }
-  } else if (typeof portDefinitionCallback === 'boolean') {
-    expandedCallback = portDefinitionCallback
-      ? {
-        type: callback.ERROR,
-        tag: defaultTagFunction,
-        name: portName + 'Finished'
-      }
-      : false
-  } else if (typeof portDefinitionCallback === 'string') {
-    // Assume the callback has been set to one of the callback constants
-    expandedCallback = {
-      type: portDefinitionCallback,
-      tag: defaultTagFunction,
-      name: portName + 'Finished'
-    }
-  }
-  logger.debug(`Expanded callback for port ${portName} from`, portDefinitionCallback, 'to', expandedCallback)
-  return expandedCallback
-}
-
-/* Main attachPort function */
+import { callback, logging } from './constants'
+import * as detect from './detect'
+import * as defaults from './defaults'
+import { expandCallbackObject } from './schema'
 
 const attachPorts = (ports, options, app) => {
   // Check arguments
   checkArgType('object', ports, 'ports', 1)
-  if (looksLikeOptions(options)) {
+  if (detect.looksLikeOptions(options)) {
     if (app === undefined) {
       // Looks like app was not given
       throw new TypeError('Third argument "app" should be an Elm app instance, but it\'s undefined.')
     }
-  } else if (options !== undefined && looksLikeApp(options)) {
+  } else if (options !== undefined && detect.looksLikeApp(options)) {
     // app was passed as the second argument, fix argument order
     app = options
     options = {}
@@ -150,7 +67,7 @@ const attachPorts = (ports, options, app) => {
       let portResult
       try {
         portResult = func(splitArgs ? splitArgs.rest : data)
-        portResult = looksLikePromise(portResult)
+        portResult = detect.looksLikePromise(portResult)
           ? (logger.debug(`Resolving promise result from port ${name}...`), portResult)
           : Promise.resolve(portResult)
       } catch (error) {
@@ -235,6 +152,8 @@ const attachPorts = (ports, options, app) => {
   }
 
   // Begin attaching ports
+  // TODO we'll never get here if app.ports isn't an Objet, since we detect
+  // app based on the existance of ports
   if (typeof app.ports !== 'object' || Object.keys(app.ports).length === 0) {
     throw new Error('This Elm app has no ports')
   }
@@ -243,7 +162,7 @@ const attachPorts = (ports, options, app) => {
     .reduce((attachedPorts, portName) => {
       logger.debug(`Inspecting port ${portName}`)
       const port = app.ports[portName]
-      if (isInputPort(port)) {
+      if (detect.isInputPort(port)) {
         if (ports[portName]) {
           // This port only has a `send` function to send data to Elm. It can't
           // be subscribed to. Show an error but continue running.
@@ -256,7 +175,7 @@ const attachPorts = (ports, options, app) => {
           attachedPorts.push(portName)
         } else if (options.listenToEmptyPorts) {
           logger.debug(`User has not defined a handler for port ${portName}, adding 'empty' listener`)
-          port.subscribe(emptyPortListener)
+          port.subscribe(defaults.emptyPortListener)
         } else {
           logger.debug(`No listener was attached to port ${portName} because there isn't a user defined listener and options.listenToEmptyPorts isn't enabled`)
         }
@@ -268,7 +187,7 @@ const attachPorts = (ports, options, app) => {
     .reduce(
       (ports, portName) =>
         R.over(
-          isInputPort(app.ports[portName]) ? R.lensProp('input') : R.lensProp('output'),
+          detect.isInputPort(app.ports[portName]) ? R.lensProp('input') : R.lensProp('output'),
           R.inc,
           ports
         ),
@@ -279,8 +198,6 @@ const attachPorts = (ports, options, app) => {
   logger.debug(`Attached ${attachedPorts.length} out of ${Object.keys(ports).length} user defined port(s)`)
   return app
 }
-
-/* Export public stuff */
 
 export default {
   callback,
