@@ -31,15 +31,15 @@ const attachPorts = (ports, options, app) => {
   }
 
   const portWrapper = (name, portDefinition, elmPort) => {
-    const func
-      = typeof portDefinition === 'function'
+    const func =
+      typeof portDefinition === 'function'
         ? portDefinition
         : typeof portDefinition === 'object' && typeof portDefinition.func === 'function'
           ? portDefinition.func
           : null
 
-    const expandedCallback
-      = typeof portDefinition === 'object'
+    const expandedCallback =
+      typeof portDefinition === 'object'
         ? expandCallbackObject(logger, name, portDefinition.callback)
         : false
 
@@ -48,8 +48,8 @@ const attachPorts = (ports, options, app) => {
     }
 
     elmPort.subscribe(data => {
-      const splitArgs
-        = expandedCallback
+      const splitArgs =
+        expandedCallback
           ? typeof expandedCallback.tag === 'function'
             ? expandedCallback.tag(data)
             : false

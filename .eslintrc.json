@@ -12,6 +12,10 @@
       "named": "never",
       "asyncArrow": "always"
     }],
-    "operator-linebreak": ["error", "before"]
+    "operator-linebreak": ["error", "before", {
+        "overrides": {
+          "=": "after"
+        }
+    }]
   }
 }
