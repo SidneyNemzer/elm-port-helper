@@ -5,6 +5,7 @@
     "promise"
   ],
   "rules": {
+    "valid-typeof": "off",
     "spaced-comment": "off",
     "space-in-parens": "off",
     "space-before-function-paren": ["error", {
