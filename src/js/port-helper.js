@@ -7,17 +7,21 @@ import * as defaults from './defaults'
 import { expandCallbackObject } from './schema'
 
 const attachPorts = (ports, options, app) => {
-  // Check arguments
+  // Verify arguments
   checkArgType('object', ports, 'ports', 1)
-  if (detect.looksLikeOptions(options)) {
-    if (app === undefined) {
-      // Looks like app was not given
-      throw new TypeError('Third argument "app" should be an Elm app instance, but it\'s undefined.')
-    }
-  } else if (options !== undefined && detect.looksLikeApp(options)) {
+  if (options !== undefined && detect.looksLikeApp(options)) {
     // app was passed as the second argument, fix argument order
     app = options
     options = {}
+  }
+
+  if (app === undefined || !detect.looksLikeApp(app)) {
+    // Looks like app was not given
+    throw new TypeError('Third argument "app" should be an Elm app instance, but it\'s ' + typeof app)
+  }
+
+  if (Object.keys(app.ports).length === 0) {
+    throw new Error('The given Elm app has no ports')
   }
 
   options.listenToEmptyPorts = typeof options.listenToEmptyPorts === 'boolean' ? options.listenToEmptyPorts : true
@@ -152,33 +156,25 @@ const attachPorts = (ports, options, app) => {
   }
 
   // Begin attaching ports
-  // TODO we'll never get here if app.ports isn't an Objet, since we detect
-  // app based on the existance of ports
-  if (typeof app.ports !== 'object' || Object.keys(app.ports).length === 0) {
-    throw new Error('This Elm app has no ports')
-  }
   logger.debug('Started attaching ports')
   const attachedPorts = Object.keys(app.ports)
     .reduce((attachedPorts, portName) => {
       logger.debug(`Inspecting port ${portName}`)
-      const port = app.ports[portName]
-      if (detect.isInputPort(port)) {
-        if (ports[portName]) {
-          // This port only has a `send` function to send data to Elm. It can't
-          // be subscribed to. Show an error but continue running.
-          logger.error(`Cannot attach to port ${portName} because it's an input port`)
+      const elmPort = app.ports[portName]
+      const userPort = ports[portName]
+
+      if (userPort) {
+        if (detect.isInputPort(elmPort)) {
+          throw new TypeError(`Cannot subscribe to port ${portName} because it's an input port`)
         }
+        portWrapper(portName, userPort, elmPort)
+        attachedPorts.push(portName)
+        logger.debug(`Added user-defined handler to port ${portName}`)
+      } else if (options.listenToEmptyPorts) {
+        elmPort.subscribe(defaults.emptyPortListener(portName))
+        logger.debug(`User has not defined a handler for port ${portName}, added 'empty' listener`)
       } else {
-        if (ports[portName]) {
-          logger.debug(`Adding user-defined handler to port ${portName}`)
-          portWrapper(portName, ports[portName], port)
-          attachedPorts.push(portName)
-        } else if (options.listenToEmptyPorts) {
-          logger.debug(`User has not defined a handler for port ${portName}, adding 'empty' listener`)
-          port.subscribe(defaults.emptyPortListener)
-        } else {
-          logger.debug(`No listener was attached to port ${portName} because there isn't a user defined listener and options.listenToEmptyPorts isn't enabled`)
-        }
+        logger.debug(`No listener was attached to port ${portName} because there isn't a user defined listener and options.listenToEmptyPorts isn't enabled`)
       }
       return attachedPorts
     }, [])
