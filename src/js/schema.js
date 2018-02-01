@@ -1,5 +1,43 @@
+import * as R from 'ramda'
 import { callback } from './constants'
 import * as defaults from './defaults'
+
+const isType = (expected, value) => (
+  typeof value === expected.name.toLowerCase()
+)
+
+const checkSchemaKey = (key, keySchema, value) => {
+  if (!value) {
+    if (!keySchema.default) {
+      throw new TypeError(`${key} is required but wasn't given`)
+    }
+    return keySchema.default
+  }
+  if (keySchema.type && !isType(keySchema.type, value)) {
+    throw new TypeError(`${key} must be the type ${keySchema.type.name.toLowerCase()} but it's ${typeof value}`)
+  }
+  if (keySchema.enum && !keySchema.enum.includes(value)) {
+    throw new Error(`${key} must be one of ${JSON.stringify(keySchema.enum)} but it's ${JSON.stringify(value)}`)
+  }
+  if (isType(Function, keySchema.test)) {
+    const testResult = keySchema.test(value)
+    if (isType(String, testResult)) {
+      throw new Error(`${key}'s value ${JSON.stringify(value)} failed the schema test: ${testResult}`)
+    }
+  }
+  return value
+}
+
+export const createSchema = schemaDescription => value => {
+  if (!isType(Object, value)) {
+    if (isType(String, schemaDescription.root)) {
+      value = { [schemaDescription.root]: value }
+    } else {
+      throw new TypeError('Expected object but got ' + typeof value)
+    }
+  }
+  return R.mapObjIndexed((keySchema, key) => checkSchemaKey(key, keySchema, value[key]))
+}
 
 export const expandCallbackObject = (logger, portName, portDefinitionCallback) => {
   let expandedCallback = false
@@ -44,4 +82,10 @@ export const expandCallbackObject = (logger, portName, portDefinitionCallback) =
   }
   logger.debug(`Expanded callback for port ${portName} from`, portDefinitionCallback, 'to', expandedCallback)
   return expandedCallback
+}
+
+// Export some additional functions for testing
+export const TESTING_USE_ONLY = {
+  isType,
+  checkSchemaKey
 }
