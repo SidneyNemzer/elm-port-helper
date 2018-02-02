@@ -36,7 +36,10 @@ export const createSchema = schemaDescription => value => {
       throw new TypeError('Expected object but got ' + typeof value)
     }
   }
-  return R.mapObjIndexed((keySchema, key) => checkSchemaKey(key, keySchema, value[key]))
+  return R.mapObjIndexed(
+    (keySchema, key) => checkSchemaKey(key, keySchema, value[key]),
+    schemaDescription.keys
+  )
 }
 
 export const expandCallbackObject = (logger, portName, portDefinitionCallback) => {
