@@ -7,8 +7,8 @@ const isType = (expected, value) => (
 )
 
 const checkSchemaKey = (key, keySchema, value) => {
-  if (!value) {
-    if (!keySchema.default) {
+  if (value === undefined) {
+    if (!keySchema.hasOwnProperty('default')) {
       throw new TypeError(`${key} is required but wasn't given`)
     }
     return keySchema.default
