@@ -142,3 +142,32 @@ test('callback does not modify values when they are valid', t => {
     name: 'testName'
   })
 })
+
+/* port */
+
+test('portNoCallback correctly extands a function to an object', t => {
+  const { portNoCallback } = schema.TESTING_USE_ONLY
+  const result = portNoCallback(() => {})
+  t.false(result.callback)
+  t.is(typeof result.func, 'function')
+})
+
+test('port correctly extands a function to an object', t => {
+  const result = schema.port('test', () => {})
+  t.is(typeof result.callback, 'object')
+  t.is(typeof result.func, 'function')
+})
+
+test('port does not modify values when they are valid', t => {
+  const tagFn = () => ({ tag: true, rest: true })
+  const result = schema.port('test', {
+    // You'd never use the tagFn like this, but it saves us having to create another fake function
+    func: tagFn,
+    callback: {
+      tag: tagFn
+    }
+  })
+  t.is(result.func, tagFn)
+  t.is(result.callback.tag, tagFn)
+  t.is(result.callback.type, constants.callback.ERROR)
+})

@@ -68,8 +68,31 @@ export const callback = portName =>
     }
   })
 
+const portNoCallback =
+  createSchema({
+    root: 'func',
+    keys: {
+      func: {
+        type: Function,
+        required: true
+      },
+      callback: {
+        default: false
+      }
+    }
+  })
+
+// Second argument is intentional, I don't want to curry or use partial application
+// with this function
+export const port = (portName, portDescription) =>
+  R.pipe(
+    portNoCallback,
+    R.over(R.lensProp('callback'), callback(portName))
+  )(portDescription)
+
 // Export some additional functions for testing
 export const TESTING_USE_ONLY = {
   isType,
-  checkSchemaKey
+  checkSchemaKey,
+  portNoCallback
 }
