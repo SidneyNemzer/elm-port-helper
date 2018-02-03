@@ -48,7 +48,7 @@ export const callback = portName =>
     keys: {
       type: {
         enum: R.values(constants.callback),
-        default: constants.callback.NONE
+        default: constants.callback.ERROR
       },
       tag: {
         type: Function,
