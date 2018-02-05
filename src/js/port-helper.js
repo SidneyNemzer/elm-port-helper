@@ -48,7 +48,13 @@ const attachPorts = (ports, options, app) => {
         }
         const expandedDefinition = schema.port(portDefinition)
         logger.debug(`Expended options for port ${portName} to`, expandedDefinition)
-        elmPort.subscribe(portWrapper(logger, portName, expandedDefinition))
+        elmPort.subscribe(portWrapper(
+          logger,
+          portName,
+          expandedDefinition,
+          app,
+          options.warnOnIgnoredReturns
+        ))
         attachedPorts.push(portName)
         logger.debug(`Added user-defined handler to port ${portName}`)
       } else if (options.listenToEmptyPorts) {
