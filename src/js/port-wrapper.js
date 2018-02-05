@@ -23,6 +23,11 @@ const portWrapper = (logger, name, { func, callback }, app, warnOnIgnoredReturns
 
   return portResult
     .then(result => {
+      // TODO Improve logging -- currently, it will incorrectly say "Port name returned
+      // a value to Elm: undefined" when an error-only port returns undefined. This
+      // shouldn't be logged, instead it should say the port finished with no result.
+      // But if an error-only port DOES return something, that should be logged
+      // as a warning.
       if (callback.type) {
         logger.info(`Port ${name} returned a value to Elm:`, result)
         if (splitArgs) {
