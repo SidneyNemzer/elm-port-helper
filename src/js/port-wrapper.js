@@ -21,7 +21,7 @@ const portWrapper = (logger, name, { func, callback }, app, warnOnIgnoredReturns
     portResult = Promise.reject(error)
   }
 
-  portResult
+  return portResult
     .then(result => {
       if (callback.type) {
         logger.info(`Port ${name} returned a value to Elm:`, result)
