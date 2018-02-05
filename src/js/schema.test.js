@@ -69,15 +69,31 @@ test(
 test(
   'returns the value when it passes the test function',
   checkSchemaKeyMacro,
-  { test: val => val.includes('includes-this') || 'failed' },
+  { test: val => val.includes('includes-this') && val },
   'it-includes-this',
   'it-includes-this'
 )
 
 test(
-  'the value does not pass the test function',
+  'allows the test function to alter the value',
+  checkSchemaKeyMacro,
+  { test: val => val === 'change me' ? 'to this' : val },
+  'change me',
+  'to this'
+)
+
+test(
+  'when the value does not pass the test function',
   checkSchemaKeyErrorMacro,
-  { test: val => val.includes('not-this') || 'failed test' },
+  {
+    test: val => {
+      if (val.includes('not-this')) {
+        return val
+      } else {
+        throw new Error('failed test')
+      }
+    }
+  },
   'it-includes-this',
   `testKey's value "it-includes-this" failed the schema test: failed test`
 )

@@ -20,9 +20,10 @@ const checkSchemaKey = (key, keySchema, value) => {
     throw new Error(`${key} must be one of ${JSON.stringify(keySchema.enum)} but it's ${JSON.stringify(value)}`)
   }
   if (isType(Function, keySchema.test)) {
-    const testResult = keySchema.test(value)
-    if (isType(String, testResult)) {
-      throw new Error(`${key}'s value ${JSON.stringify(value)} failed the schema test: ${testResult}`)
+    try {
+      value = keySchema.test(value)
+    } catch (error) {
+      throw new Error(`${key}'s value ${JSON.stringify(value)} failed the schema test: ${error.message}`)
     }
   }
   return value
@@ -51,14 +52,20 @@ export const callback = portName =>
         default: constants.callback.ERROR
       },
       tag: {
-        type: Function,
         default: defaults.tagFunction,
-        test: fn => {
-          const result = fn([1, 2, 3])
-          return (
-            (R.has('tag', result) && R.has('rest', result))
-              || 'The callback.tag function must return an object with "tag" and "result"'
-          )
+        test: value => {
+          if (isType(Boolean, value)) {
+            return value && defaults.tagFunction
+          } else if (isType(Function, value)) {
+            const result = value([1, 2, 3])
+            if (R.has('tag', result) && R.has('rest', result)) {
+              return value
+            } else {
+              throw new Error('The callback.tag function must return an object with "tag" and "result"')
+            }
+          } else {
+            throw new TypeError(`tag must be a function or false but it's ${typeof value}`)
+          }
         }
       },
       name: {
