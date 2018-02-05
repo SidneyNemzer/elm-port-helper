@@ -1,7 +1,7 @@
 import * as constants from './constants'
 
 const portWrapper = (logger, name, { func, callback }, app, warnOnIgnoredReturns) => data => {
-  const splitArgs = callback.type && callback.tag(data)
+  const splitArgs = callback.type && callback.tag && callback.tag(data)
 
   if (splitArgs) {
     logger.debug(`Port ${name} has been called by elm with`, {
