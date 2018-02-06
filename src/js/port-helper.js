@@ -24,11 +24,10 @@ const attachPorts = (ports, options, app) => {
     throw new Error('The given Elm app has no ports')
   }
 
-  options.listenToEmptyPorts = typeof options.listenToEmptyPorts === 'boolean' ? options.listenToEmptyPorts : true
-  options.warnOnIgnoredReturns = typeof options.warnOnIgnoredReturns === 'boolean' ? options.warnOnIgnoredReturns : true
+  options = schema.options(options)
 
   // Create logger
-  const logger = createLogger('elm-port-helper', options.logging || logging.ERRORS)
+  const logger = createLogger('elm-port-helper', options.logging)
 
   if (options.logging >= logging.DEBUG) {
     console.warn('[elm-port-helper] Debug logging is enabled. There will be a lot of messages. You might want disable this in production.')

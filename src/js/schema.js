@@ -97,6 +97,24 @@ export const port = (portName, portDescription) =>
     R.over(R.lensProp('callback'), callback(portName))
   )(portDescription)
 
+export const options =
+  createSchema({
+    keys: {
+      listenToEmptyPorts: {
+        type: Boolean,
+        default: true
+      },
+      warnOnIgnoredReturns: {
+        type: Boolean,
+        default: true
+      },
+      logging: {
+        enum: R.values(constants.logging),
+        default: constants.logging.ERRORS
+      }
+    }
+  })
+
 // Export some additional functions for testing
 export const TESTING_USE_ONLY = {
   isType,
