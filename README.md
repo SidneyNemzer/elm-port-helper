@@ -56,7 +56,7 @@ See full examples in [the examples folder](examples).
 from GitHub:
 
 ```
-npm install sidneynemzer/elm-port-helper#v1.0.0
+npm install sidneynemzer/elm-port-helper#v1.0.1
 ```
 
 Replace "1.0.0" with the version that you want (See [the list of versions](https://github.com/SidneyNemzer/elm-port-helper/releases))

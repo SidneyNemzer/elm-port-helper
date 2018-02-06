@@ -1,6 +1,6 @@
 {
   "name": "elm-port-helper",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Helper functions for managing Elm ports",
   "main": "index.js",
   "directories": {
