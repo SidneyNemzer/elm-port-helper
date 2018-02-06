@@ -1,6 +1,6 @@
 # elm-port-helper
 
-Elm's ports allow Elm to communicate with JavaScript.
+[Elm](http://elm-lang.org/)'s ports allow Elm to communicate with JavaScript.
 
 I've noticed several things about ports:
 
@@ -8,7 +8,7 @@ I've noticed several things about ports:
 * You might forget to connect a port on the JavaScript side
 * Returning a result to Elm often uses one of a few similar patterns
 
-I created elm-port-helper to fix address these.
+I created elm-port-helper to make the JavaScript side of ports less tedious.
 
 ## Quick Example
 
@@ -59,7 +59,7 @@ from GitHub:
 npm install sidneynemzer/elm-port-helper#v1.0.0
 ```
 
-Replace "1.0.0" with the version that you want
+Replace "1.0.0" with the version that you want (See [the list of versions](https://github.com/SidneyNemzer/elm-port-helper/releases))
 
 ## API
 
