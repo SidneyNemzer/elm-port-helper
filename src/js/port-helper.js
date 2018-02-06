@@ -47,6 +47,14 @@ const attachPorts = (ports, options, app) => {
         }
         const expandedDefinition = schema.port(portName, portDefinition)
         logger.debug(`Expended options for port ${portName} to`, expandedDefinition)
+        const callbackName = expandedDefinition.callback.name
+        if (expandedDefinition.callback.type) {
+          if (!app.ports[callbackName]) {
+            throw new Error(`Port ${portName} is set to use port ${callbackName} as a callback, but that port doesn't exist on the Elm app`)
+          } else if (!detect.isInputPort(app.ports[callbackName])) {
+            throw new Error(`Port ${portName} is set to use port ${callbackName} as a callback, but that port isn't an input port`)
+          }
+        }
         elmPort.subscribe(portWrapper(
           logger,
           portName,
