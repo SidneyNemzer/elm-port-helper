@@ -17,6 +17,9 @@ port storageGet : ( String, String ) -> Cmd msg
 port storageGetFinished : (( String, String ) -> msg) -> Sub msg
 
 
+port notListenedPort : String -> Cmd msg
+
+
 main : Program Never Model Msg
 main =
     Html.program
@@ -41,7 +44,7 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    Model "" "" ! []
+    Model "" "" ! [ notListenedPort "are you listening?" ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
