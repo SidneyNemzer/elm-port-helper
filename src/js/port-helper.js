@@ -57,11 +57,13 @@ const attachPorts = (ports, options, app) => {
         ))
         attachedPorts.push(portName)
         logger.debug(`Added user-defined handler to port ${portName}`)
-      } else if (options.listenToEmptyPorts) {
-        elmPort.subscribe(defaults.emptyPortListener(portName))
-        logger.debug(`User has not defined a handler for port ${portName}, added 'empty' listener`)
-      } else {
-        logger.debug(`No listener was attached to port ${portName} because there isn't a user defined listener and options.listenToEmptyPorts isn't enabled`)
+      } else if (!detect.isInputPort(elmPort)) {
+        if (options.listenToEmptyPorts) {
+          elmPort.subscribe(defaults.emptyPortListener(portName))
+          logger.debug(`User has not defined a handler for port ${portName}, added 'empty' listener`)
+        } else {
+          logger.debug(`No listener was attached to port ${portName} because there isn't a user defined listener and options.listenToEmptyPorts isn't enabled`)
+        }
       }
       return attachedPorts
     }, [])
