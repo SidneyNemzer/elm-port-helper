@@ -46,7 +46,7 @@ const attachPorts = (ports, options, app) => {
         if (detect.isInputPort(elmPort)) {
           throw new TypeError(`Cannot subscribe to port ${portName} because it's an input port`)
         }
-        const expandedDefinition = schema.port(portDefinition)
+        const expandedDefinition = schema.port(portName, portDefinition)
         logger.debug(`Expended options for port ${portName} to`, expandedDefinition)
         elmPort.subscribe(portWrapper(
           logger,
