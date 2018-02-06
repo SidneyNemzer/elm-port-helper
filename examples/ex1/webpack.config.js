@@ -8,7 +8,7 @@ module.exports = {
     filename: '[name].js'
   },
 
-  devtool: 'cheap-module-source-map',
+  devtool: 'cheap-module-eval-source-map',
 
   module: {
     noParse: /\.elm$/,

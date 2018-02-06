@@ -12,7 +12,7 @@ export default (prefix, logLevel) => {
   checkArgType('number', logLevel, 'logLevel', 1)
   return levels.reduce((logObject, level, index) => {
     logObject[level] = (...data) => {
-      if (logLevel >= index) {
+      if (logLevel > index) {
         levelToConsole[level](`[${prefix}] [${level}]`, ...data)
       }
     }

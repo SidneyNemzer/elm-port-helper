@@ -5,6 +5,8 @@ import Html.Attributes exposing (value)
 import Html.Events exposing (onClick, onInput)
 
 
+{-| Currently, setTitle isn't used in the example (but the JavaScript adds a listener)
+-}
 port setTitle : String -> Cmd msg
 
 
@@ -15,6 +17,13 @@ port storageGet : ( String, String ) -> Cmd msg
 
 
 port storageGetFinished : (( String, String ) -> msg) -> Sub msg
+
+
+{-| JavaScript doesn't add a listener to this port, to demontrate what happens if
+you forget to add a listener (hint: you get a warning if the port sends data to
+JavaScript)
+-}
+port notListenedPort : String -> Cmd msg
 
 
 main : Program Never Model Msg
@@ -41,7 +50,7 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    Model "" "" ! []
+    Model "" "" ! [ notListenedPort "are you listening?" ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )

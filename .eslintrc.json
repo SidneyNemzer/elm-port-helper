@@ -5,6 +5,7 @@
     "promise"
   ],
   "rules": {
+    "valid-typeof": "off",
     "spaced-comment": "off",
     "space-in-parens": "off",
     "space-before-function-paren": ["error", {
@@ -12,6 +13,10 @@
       "named": "never",
       "asyncArrow": "always"
     }],
-    "operator-linebreak": ["error", "before"]
+    "operator-linebreak": ["error", "before", {
+        "overrides": {
+          "=": "after"
+        }
+    }]
   }
 }
