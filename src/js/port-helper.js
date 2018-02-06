@@ -7,7 +7,7 @@ import * as schema from './schema'
 import portWrapper from './port-wrapper'
 
 const attachPorts = (ports, options, app) => {
-  // Verify arguments
+  /* Verify arguments */
   checkArgType('object', ports, 'ports', 1)
   if (options !== undefined && detect.looksLikeApp(options)) {
     // app was passed as the second argument, fix argument order
@@ -26,14 +26,14 @@ const attachPorts = (ports, options, app) => {
 
   options = schema.options(options)
 
-  // Create logger
+  /* Initalize logger */
   const logger = createLogger('elm-port-helper', options.logging)
 
   if (options.logging >= logging.DEBUG) {
     console.warn('[elm-port-helper] Debug logging is enabled. There will be a lot of messages. You might want disable this in production.')
   }
 
-  // Begin attaching ports
+  /* Attach ports */
   logger.debug('Started attaching ports')
   const attachedPorts = Object.keys(app.ports)
     .reduce((attachedPorts, portName) => {

@@ -1,5 +1,4 @@
 export const rawCheckArgType = (expectedType, value, name, index) => {
-  /* eslint-disable valid-typeof */
   if (typeof value !== expectedType) {
     throw new TypeError(`Argument ${index} "${name}" should be ${expectedType} but it's ${typeof value}`)
   }
